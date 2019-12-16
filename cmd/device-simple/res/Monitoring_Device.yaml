@@ -1,0 +1,255 @@
+name: "Monitoring_Device"
+manufacturer: "Airpoint"
+model: "SP-01"
+labels:
+  - "ForestFire"
+description: "Sensing Temperature, Humidity, and CO2"
+
+deviceResources:
+  -
+    name: "atemp"
+    description: "Average Temperature"
+    properties:
+      value:
+        { type: "Int32", readWrite: "R" }
+      units:
+        { type: "String", readWrite: "R", defaultValue: "Celsius" }
+  -
+    name: "temp"
+    description: "Temperature"
+    properties:
+      value:
+        { type: "Int32", readWrite: "R" }
+      units:
+        { type: "String", readWrite: "R", defaultValue: "Celsius" }
+  -
+    name: "ahum"
+    description: "Average Humidity"
+    properties:
+      value:
+        { type: "Int32", readWrite: "R" }
+      units:
+        { type: "String", readWrite: "R", defaultValue: "RH" }
+
+  -
+    name: "hum"
+    description: "Humidity"
+    properties:
+      value:
+        { type: "Int32", readWrite: "R" }
+      units:
+        { type: "String", readWrite: "R", defaultValue: "RH" }
+  -
+    name: "aco2"
+    description: "Average CO2"
+    properties:
+      value:
+        { type: "Int32", readWrite: "R" }
+      units:
+        { type: "String", readWrite: "R", defaultValue: "ppm" }
+
+  -
+    name: "co2"
+    description: "CO2"
+    properties:
+      value:
+        { type: "Int32", readWrite: "R" }
+      units:
+        { type: "String", readWrite: "R", defaultValue: "ppm" }
+
+  -
+    name: "task"
+    description: "Task ID to create"
+    properties:
+      value:
+        { type: "String", readWrite: "R" }
+      units:
+        { type: "String", readWrite: "R", defaultValue: "" }
+
+  -
+    name: "taskToChange"
+    description: "Task ID to change FP"
+    properties:
+      value:
+        { type: "String", readWrite: "R" }
+      units:
+        { type: "String", readWrite: "R", defaultValue: "" }
+
+  -
+    name: "taskToRun"
+    description: "Task ID to execute"
+    properties:
+      value:
+        { type: "String", readWrite: "R" }
+      units:
+        { type: "String", readWrite: "R", defaultValue: "" }
+
+  -
+    name: "osbp"
+    description: "Observing Period"
+    properties:
+      value:
+        { type: "String", readWrite: "R" }
+      units:
+        { type: "String", readWrite: "R", defaultValue: "" }
+   
+  -
+    name: "senp"
+    description: "Sensing Period"
+    properties:
+      value:
+        { type: "String", readWrite: "R" }
+      units:
+        { type: "String", readWrite: "R", defaultValue: "" }
+
+  -
+    name: "send"
+    description: "Sensing Duration"
+    properties:
+      value:
+        { type: "String", readWrite: "R" }
+      units:
+        { type: "String", readWrite: "R", defaultValue: "" }
+ 
+  -
+    name: "avgn"
+    description: "Averaging Number"
+    properties:
+      value:
+        { type: "String", readWrite: "R" }
+      units:
+        { type: "String", readWrite: "R", defaultValue: "" }
+ 
+  -
+    name: "avgt"
+    description: "Averaging Time"
+    properties:
+      value:
+        { type: "String", readWrite: "R" }
+      units:
+        { type: "String", readWrite: "R", defaultValue: "" }
+
+  -
+    name: "taskToRead"
+    description: "Task ID to read"
+    properties:
+      value:
+        { type: "String", readWrite: "R" }
+      units:
+        { type: "String", readWrite: "R", defaultValue: "" }
+
+  -
+    name: "taskToStop"
+    description: "Task ID to stop"
+    properties:
+      value:
+        { type: "String", readWrite: "R" }
+      units:
+        { type: "String", readWrite: "R", defaultValue: "" }
+
+deviceCommands:
+  -
+    name: "Task"
+    set:
+      - { operation: "set", deviceResource: "task", parameter: "[]" }
+  -
+    name: "SetFP"
+    set:
+      -  { operation: "set", deviceResource: "taskToChange", parameter: "nil" }
+      -  { operation: "set", deviceResource: "osbp", parameter: "nil" }
+      -  { operation: "set", deviceResource: "senp", parameter: "nil" }
+      -  { operation: "set", deviceResource: "send", parameter: "nil" }
+      -  { operation: "set", deviceResource: "avgn", parameter: "nil" }
+      -  { operation: "set", deviceResource: "avgt", parameter: "nil" }
+  -
+    name: "TaskRun"
+    set:
+      - { operation: "set", deviceResource: "taskToRun", parameter: "[]" }
+    get:
+      - { operation: "get", deviceResource: "taskToRun", parameter: "[]" }
+  -
+    name: "TaskRead"
+    set:
+      - { operation: "set", deviceResource: "taskToRead", parameter: "[]" }
+  -
+    name: "TaskStop"
+    set:
+      - { operation: "set", deviceResource: "taskToStop", parameter: "[]" }
+
+coreCommands:
+  -
+    name: "Task"
+    put:
+      path: "/api/v1/device/{deviceId}/Task"
+      parameterNames: ["task"]
+      responses:
+        -
+          code: "200"
+          description: "Task Creation Success!!"
+        -
+          code: "500"
+          description: "Internal Server Error"
+          expectedValues: []
+  -
+    name: "SetFP"
+    put:
+      path: "/api/v1/device/{deviceId}/SetFP"
+      parameterNames: ["taskToChange","osbp", "senp", "send", "avgn", "avgt"]
+      responses:
+        -
+          code: "200"
+          description: "Flexible Parameter Changed Successfully!!"
+        -
+          code: "500"
+          description: "Internal Server Error"
+          expectedValues: []
+  -
+    name: "TaskRun"
+    get:
+      path: "/api/v1/device/{deviceId}/TaskRun"
+      responses:
+        -
+          code: "200"
+          description: ""
+          expectedValues: ["taskToRun"]
+        -
+          code: "500"
+          description: "Internal Server Error"
+          expectedValues: []
+    put:
+      path: "/api/v1/device/{deviceId}/TaskRun"
+      parameterNames: ["taskToRun"]
+      responses:
+        -
+          code: "200"
+          description: "Task Run Success!!"
+        -
+          code: "500"
+          description: "Internal Server Error"
+          expectedValues: []
+  -
+    name: "TaskRead"
+    put:
+      path: "/api/v1/device/{deviceId}/TaskRead"
+      parameterNames: ["taskToRead"]
+      responses:
+        -
+          code: "200"
+          description: "Task Read Success!!"
+        -
+          code: "500"
+          description: "Internal Server Error"
+          expectedValues: []
+  -
+    name: "TaskStop"
+    put:
+      path: "/api/v1/device/{deviceId}/TaskStop"
+      parameterNames: ["taskToStop"]
+      responses:
+        -
+          code: "200"
+          description: "Task Stop Success!!"
+        -
+          code: "500"
+          description: "Internal Server Error"
+          expectedValues: []
