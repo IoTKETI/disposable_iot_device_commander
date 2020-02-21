@@ -17,10 +17,18 @@ import (
 	"time"
 	"io"
 
+	flags "github.com/jessevdk/go-flags"
 	dsModels "github.com/edgexfoundry/device-sdk-go/pkg/models"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/logger"
 	contract "github.com/edgexfoundry/go-mod-core-contracts/models"
 )
+
+type Options struct {
+	UseRegistry   string `short:"r" long:"registry" description:"Indicates the service should use the registry and provide the registry url." optional:"true" optional-value:"LOAD_FROM_FILE"`
+	ConfProfile   string `short:"p" long:"profile" description:"Specify a profile other than default."`
+	ConfDir       string `short:"c" long:"confdir" description:"Specify an alternate configuration directory."`
+	OverwriteConf bool   `short:"o" long:"overwrite" description:"Overwrite configuration in the registry."`
+}
 
 type SimpleDriver struct {
 	lc           logger.LoggingClient
@@ -36,6 +44,7 @@ var (
 	command_list map[string][2]string
 	dri_in_MS int
 	current_running_task map[string][]string
+	IPE_addr = "localhost:8000"
 )
 
 func parse(str *string, start_index int, prefix string, field map[string]string) int {
@@ -98,8 +107,25 @@ func parse(str *string, start_index int, prefix string, field map[string]string)
         return -1
 }
 
+func ReconnectToIPE(conn net.Conn){
+	fmt.Println("IPE disconnected!!")
+	for {
+		fmt.Println("Try to connect to IPE!!")
+		conn, _ = net.Dial("tcp",IPE_addr)
+		if conn != nil {
+			fmt.Println("Reconnect success!!")
+			break
+		}
+		time.Sleep(10 * time.Second)
+	}
+}
+
 func IPEMessageHandler(){
 	recv_buf := make([]byte, 4096)
+
+	if conn == nil {
+		ReconnectToIPE(conn)
+	}
 
 	for {
 		n, err := conn.Read(recv_buf)
@@ -108,16 +134,7 @@ func IPEMessageHandler(){
 			conn.Close()
 			conn = nil
 			if err == io.EOF {
-				fmt.Println("IPE disconnected!!")
-				for {
-					fmt.Println("Try to connect to IPE!!")
-					conn, _ = net.Dial("tcp",":8000")
-					if conn != nil {
-						fmt.Println("Reconnect success!!")
-						break
-					}
-					time.Sleep(10 * time.Second)
-				}
+				ReconnectToIPE(conn)
 				continue
 			} else {
 				return
@@ -144,7 +161,13 @@ func IPEMessageHandler(){
 func (s *SimpleDriver) Initialize(lc logger.LoggingClient, asyncCh chan<- *dsModels.AsyncValues) error {
 	command_list = make(map[string][2]string)
 	current_running_task = make(map[string][]string)
-	conn, _ = net.Dial("tcp",":8000")
+	var opts Options
+	flags.Parse(&opts)
+	if opts.ConfProfile == "docker" {
+		IPE_addr = "disposable-iot-ztm-edge:8000"
+	}
+	fmt.Println(IPE_addr)
+	conn, _ = net.Dial("tcp",IPE_addr)
 
 	go IPEMessageHandler()
 

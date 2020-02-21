@@ -2,11 +2,11 @@
 LogLevel = 'INFO'
 
 [Service]
-Host = "localhost"
+Host = "disposable-iot-device-commander"
 Port = 49990
 ConnectRetries = 20
 Labels = []
-OpenMsg = "device simple started"
+OpenMsg = "device-commander started"
 Timeout = 5000
 EnableAsyncReadings = true
 AsyncBufferSize = 16
@@ -51,7 +51,5 @@ FailWaitTime = 10
   ProfilesDir = "./res"
 
 [Logging]
-EnableRemote = false
-File = "./device-simple.log"
-
-# Pre-define Devices
+EnableRemote = true
+File = "/edgex/logs/device-commander.log"
