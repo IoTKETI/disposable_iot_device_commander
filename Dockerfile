@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-ARG BASE=golang:1.12-alpine
+ARG BASE=golang:1.13-alpine
 FROM ${BASE} AS builder
 
 ARG MAKE='make build'
@@ -47,6 +47,7 @@ EXPOSE $APP_PORT
 WORKDIR /
 COPY --from=builder /disposable_iot_device_commander/cmd/device-simple/device-commander /usr/local/bin/device-commander
 COPY --from=builder /disposable_iot_device_commander/cmd/device-simple/res/docker/configuration.toml /res/docker/configuration.toml
+COPY --from=builder /disposable_iot_device_commander/cmd/device-simple/res/Monitoring_Device.yaml /res/Monitoring_Device.yaml
 
 ENTRYPOINT ["/usr/local/bin/device-commander"]
 CMD ["--confdir=/res", "--profile=docker"]

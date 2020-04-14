@@ -44,7 +44,7 @@ var (
 	command_list map[string][2]string
 	dri_in_MS int
 	current_running_task map[string][]string
-	IPE_addr = "localhost:8000"
+	IPE_addr = "localhost:8700"
 )
 
 func parse(str *string, start_index int, prefix string, field map[string]string) int {
@@ -164,7 +164,7 @@ func (s *SimpleDriver) Initialize(lc logger.LoggingClient, asyncCh chan<- *dsMod
 	var opts Options
 	flags.Parse(&opts)
 	if opts.ConfProfile == "docker" {
-		IPE_addr = "disposable-iot-ztm-edge:8000"
+		IPE_addr = "disposable-iot-ztm-edge:8700"
 	}
 	fmt.Println(IPE_addr)
 	conn, _ = net.Dial("tcp",IPE_addr)
