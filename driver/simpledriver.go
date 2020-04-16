@@ -164,7 +164,7 @@ func (s *SimpleDriver) Initialize(lc logger.LoggingClient, asyncCh chan<- *dsMod
 	var opts Options
 	flags.Parse(&opts)
 	if opts.ConfProfile == "docker" {
-		IPE_addr = "disposable-iot-ztm-edge:8700"
+		IPE_addr = "dockerhost:8700"
 	}
 	fmt.Println(IPE_addr)
 	conn, _ = net.Dial("tcp",IPE_addr)
